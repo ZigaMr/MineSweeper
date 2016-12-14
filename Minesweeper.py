@@ -40,16 +40,63 @@ class Minesweeper():
             for x in range(self.st_stolpcev):
                 self.buttons[y][0].grid(row = i, column = x)
                 y+=1
-        for i in range(self.st_vrstic*self.st_stolpcev):
+
+
+        for i in range(self.st_stolpcev, self.st_vrstic*self.st_stolpcev-self.st_stolpcev):
             n=0
-            for x in [i-self.st_stolpcev-1,i-self.st_stolpcev, i - self.st_stolpcev+1,i-1,i+1,
-                      i+self.st_stolpcev-1, i+self.st_stolpcev, i+self.st_stolpcev+1]:
-                try:
+            if (i+1)%self.st_stolpcev == 0:
+                for x in [i-self.st_stolpcev-1, i-self.st_stolpcev,i-1,
+                      i+self.st_stolpcev-1, i+self.st_stolpcev]:
                     #If there's a mine
                     if self.buttons[x][1] == 1:
                         n+=1
-                except:
-                    pass
+
+            elif (i+1)%self.st_stolpcev == 1:
+                for x in [i-self.st_stolpcev, i-self.st_stolpcev+1,i+1,
+                      i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    #If there's a mine
+                    if self.buttons[x][1] == 1:
+                        n+=1
+            else:
+                for x in [i-self.st_stolpcev-1, i-self.st_stolpcev,i-self.st_stolpcev+1,i-1,i+1,
+                      i+self.st_stolpcev-1, i+self.st_stolpcev,i+self.st_stolpcev+1]:
+                    #If there's a mine
+                    if self.buttons[x][1] == 1:
+                        n+=1
+
+
+            self.buttons[i][2]=n
+
+        for i in range(self.st_stolpcev):
+            n=0
+            if i == 0:
+                for x in [i+1,i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            elif i == self.st_stolpcev-1:
+                for x in [i-1,i+self.st_stolpcev-1, i+self.st_stolpcev]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            else:
+                for x in [i-1,i+1,i+self.st_stolpcev-1, i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    if self.buttons[x][1] == 1:
+                        n+=1
+            self.buttons[i][2]=n
+
+        for i in range(self.st_stolpcev*self.st_vrstic-self.st_stolpcev, self.st_stolpcev*self.st_vrstic):
+            n=0
+            if i == self.st_stolpcev*self.st_vrstic-self.st_stolpcev:
+                for x in [i+1,i-self.st_stolpcev, i-self.st_stolpcev+1]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            elif i == self.st_stolpcev*self.st_vrstic-1:
+                for x in [i-1,i-self.st_stolpcev-1, i-self.st_stolpcev]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            else:
+                for x in [i-1,i+1,i-self.st_stolpcev-1, i-self.st_stolpcev, i-self.st_stolpcev+1]:
+                    if self.buttons[x][1] == 1:
+                        n+=1
             self.buttons[i][2]=n
 
         master.attributes("-topmost", True)
