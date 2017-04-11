@@ -1,0 +1,176 @@
+from tkinter import *
+import random
+from functools import partial
+
+class Minesweeper():
+
+    def __init__(self,master):
+
+        self.st_vrstic = int(input("Stevilo vrstic: "))
+        self.st_stolpcev = int(input("Stevilo stolpcev: "))
+        
+        
+        #frame.pack()
+       
+
+        
+
+        self.menu = Menu(master)
+        master.config(menu=self.menu)
+        #self.menu.add_command(label="RESTART", command=root.mainloop)
+        self.menu.add_command(label="QUIT", command=root.destroy)
+        self.menu.add_command(label="RESET", command=self.nova_igra)
+        self.nicle=[]
+        self.mines=0
+        self.buttons = dict()
+        
+        
+        self.st_poklikanih = self.st_vrstic*self.st_stolpcev
+        self.nova_igra()
+    def nova_igra(self):
+        print("nova igra")
+        num_proximity_mines=0
+        frame = Frame(master)
+        Grid.rowconfigure(root, 0, weight=1)
+        Grid.columnconfigure(root, 0, weight=1)
+        frame.grid(row=0, column=0, sticky=N+S+E+W)
+        self.nicle=[]
+        self.mines=0
+        self.buttons = dict()
+        y=0
+        self.label1 = Label(frame, text="Minesweeper")
+        self.label1.grid(row = 0, column = 0, columnspan = 10)
+        for i in range(self.st_vrstic):
+            Grid.rowconfigure(frame, i, weight=1)
+            for x in range(self.st_stolpcev):
+                Grid.columnconfigure(frame, x, weight=1)
+                mine = 0
+                if random.randint(1,10) == 5:
+                    mine = 1
+                    self.mines+=1
+                self.buttons[y] = [Button(frame, bg = "green", width=3),
+                                   mine,
+                                          #command=partial(self.lclick, y, mine)),
+                                   num_proximity_mines]
+                self.buttons[y][0].bind('<Button-1>', self.lclick(y))
+                self.buttons[y][0].bind('<Button-3>', self.rclick(y))
+                self.buttons[y][0].grid(row=i, column=x,sticky=N+S+E+W)
+                y+=1
+        y=0
+        for i in range(self.st_vrstic):
+            for x in range(self.st_stolpcev):
+                self.buttons[y][0].grid(row = i, column = x)
+                y+=1
+
+        for i in range(self.st_stolpcev, self.st_vrstic*self.st_stolpcev-self.st_stolpcev):
+            n=0
+            if (i+1)%self.st_stolpcev == 0:
+                for x in [i-self.st_stolpcev-1, i-self.st_stolpcev,i-1,
+                      i+self.st_stolpcev-1, i+self.st_stolpcev]:
+                    #If there's a mine
+                    if self.buttons[x][1] == 1:
+                        n+=1
+
+            elif (i+1)%self.st_stolpcev == 1:
+                for x in [i-self.st_stolpcev, i-self.st_stolpcev+1,i+1,
+                      i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    #If there's a mine
+                    if self.buttons[x][1] == 1:
+                        n+=1
+            else:
+                for x in [i-self.st_stolpcev-1, i-self.st_stolpcev,i-self.st_stolpcev+1,i-1,i+1,
+                      i+self.st_stolpcev-1, i+self.st_stolpcev,i+self.st_stolpcev+1]:
+                    #If there's a mine
+                    if self.buttons[x][1] == 1:
+                        n+=1
+
+
+            self.buttons[i][2]=n
+
+        for i in range(self.st_stolpcev):
+            n=0
+            if i == 0:
+                for x in [i+1,i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            elif i == self.st_stolpcev-1:
+                for x in [i-1,i+self.st_stolpcev-1, i+self.st_stolpcev]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            else:
+                for x in [i-1,i+1,i+self.st_stolpcev-1, i+self.st_stolpcev, i+self.st_stolpcev+1]:
+                    if self.buttons[x][1] == 1:
+                        n+=1
+            self.buttons[i][2]=n
+
+        for i in range(self.st_stolpcev*self.st_vrstic-self.st_stolpcev, self.st_stolpcev*self.st_vrstic):
+            n=0
+            if i == self.st_stolpcev*self.st_vrstic-self.st_stolpcev:
+                for x in [i+1,i-self.st_stolpcev, i-self.st_stolpcev+1]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            elif i == self.st_stolpcev*self.st_vrstic-1:
+                for x in [i-1,i-self.st_stolpcev-1, i-self.st_stolpcev]:
+                    if self.buttons[x][1]==1:
+                        n+=1
+            else:
+                for x in [i-1,i+1,i-self.st_stolpcev-1, i-self.st_stolpcev, i-self.st_stolpcev+1]:
+                    if self.buttons[x][1] == 1:
+                        n+=1
+            self.buttons[i][2]=n
+        master.attributes("-topmost", True)
+    #def nicle_klik(self,koordinate):
+     #   for i in self.buttons
+    def lclick(self,y):
+        return lambda Button: self.lclick2(self.buttons[y],y)
+
+    def rclick(self,y):
+        return lambda Button: self.rclick2(self.buttons[y],y)
+
+    def lclick2(self,sez,y):
+        print(sez)
+        if self.buttons[y][0]["bg"] == "green":
+            self.st_poklikanih -= 1
+        if sez[1] == 1:
+            self.buttons[y][0].config(bg="red")
+            print("Mine")
+            top = Toplevel()
+            top.title("YOU LOSE")
+
+            msg = Message(top, text="LOSER")
+            msg.pack()
+        else:
+            txt = self.buttons[y][2]
+            self.buttons[y][0].config(text=str(txt))
+            self.buttons[y][0].config(bg="green yellow")
+        if self.st_poklikanih == 0 and self.mines == 0:
+            top = Toplevel()
+            msg = Message(top, text="NICE")
+            msg.pack()
+    def rclick2(self,sez,y):
+        if self.buttons[y][0]["bg"] == "green":
+            self.buttons[y][0].config(bg="yellow", text=":)")
+            self.st_poklikanih -= 1
+            if self.buttons[y][1] == 1:
+                self.mines-=1
+                
+        elif self.buttons[y][0]["bg"] == "yellow":
+            if self.buttons[y][0] == 1:
+                self.mines += 1
+            self.st_poklikanih += 1
+            self.buttons[y][0].config(bg="green", text="")
+        if self.st_poklikanih == 0 and self.mines == 0:
+            top = Toplevel()
+            msg = Message(top, text="NICE")
+            msg.pack()
+        
+        print(self.mines)
+    def restart_program():
+        root.destroy()
+        root = Tk()
+        minesweeper = Minesweeper(root)
+        root.mainloop()
+        
+root = Tk()
+minesweeper = Minesweeper(root)
+root.mainloop()
